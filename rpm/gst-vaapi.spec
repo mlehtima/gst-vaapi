@@ -1,78 +1,67 @@
-Name:           gstreamer-vaapi
-Version:        1.14.4
-Release:        1%{?dist}
-Summary:        GStreamer plugins to use VA API video acceleration
+%define majorminor   1.0
+%define gstreamer    gstreamer
 
-License:        LGPLv2+
-URL:            https://cgit.freedesktop.org/gstreamer/gstreamer-vaapi
-Source0:        https://gstreamer.freedesktop.org/src/gstreamer-vaapi/gstreamer-vaapi-%{version}.tar.xz
+Name     : %{gstreamer}%{majorminor}-vaapi
+Version  : 1.14.4
+Release  : 1
+URL      : https://cgit.freedesktop.org/gstreamer/gstreamer-vaapi
+Source0  : gstreamer1.0-vaapi-%{version}.tar.xz
+Summary  : No detailed summary available
+Group    : Development/Tools
+License  : LGPL-2.1
 
-BuildRequires:  gcc
-BuildRequires:  glib2-devel >= 2.32
-BuildRequires:  gstreamer1.0-devel >= 1.4.0
-BuildRequires:  gstreamer1.0-plugins-base-devel >= 1.4.0
-BuildRequires:  gstreamer1.0-plugins-bad-devel >= 1.4.0
-BuildRequires:  libva-devel >= 1.1.0
-BuildRequires:  libdrm-devel
-BuildRequires:  libudev-devel
-#BuildRequires:  libGL-devel
-BuildRequires:  pkgconfig(egl)
-BuildRequires:  libvpx-devel
-BuildRequires:  wayland-devel
-BuildRequires:  pkgconfig(wayland-client)  >= 1
-BuildRequires:  pkgconfig(wayland-scanner) >= 1
-BuildRequires:  pkgconfig(wayland-cursor)  >= 1
-BuildRequires:  pkgconfig(wayland-egl)     >= 1
-BuildRequires:  pkgconfig(wayland-server)  >= 1
+%define sonamever %(echo %{version} | cut -d '+' -f 1)
+
+BuildRequires : gobject-introspection
+BuildRequires : gobject-introspection-devel
+BuildRequires : pkgconfig(gstreamer-plugins-base-1.0) >= %{sonamever}
+BuildRequires : pkgconfig(gstreamer-plugins-bad-1.0) >= %{sonamever}
+BuildRequires : pkgconfig(gstreamer-1.0) >= %{sonamever}
+BuildRequires : pkgconfig(egl)
+BuildRequires : pkgconfig(glesv2)
+BuildRequires : pkgconfig(libdrm)
+BuildRequires : pkgconfig(libudev)
+BuildRequires : pkgconfig(libva)
+BuildRequires : pkgconfig(libva-drm)
+BuildRequires : pkgconfig(libva-wayland)
+BuildRequires : pkgconfig(wayland-client)
 
 %description
-A collection of GStreamer plugins to let you make use of VA API video
-acceleration from GStreamer applications.
-
-Includes elements for video decoding, display, encoding and post-processing
-using VA API (subject to hardware limitations).
-
-%package        devel-docs
-Summary:        Developer documentation for GStreamer VA API video acceleration plugins
-Requires:       %{name} = %{version}-%{release}
-BuildArch:      noarch
-
-Provides:       gstreamer1-vaapi-devel = %{version}-%{release}
-
-%description	devel-docs
-The %{name}-devel-docs package contains developer documentation
-for the GStreamer VA API video acceleration plugins
+gstreamer-vaapi
+VA-API support to GStreamer
+License
+-------
+gstreamer-vaapi helper libraries and plugin elements are available
+under the terms of the GNU Lesser General Public License v2.1+
 
 %prep
-%setup -q -n %{name}-%{version}/%{name}
+%setup -q -n gstreamer1.0-vaapi-%{version}/gstreamer-vaapi
 
 %build
-
-./autogen.sh --disable-silent-rules --disable-fatal-warnings \
-           --enable-static=no \
-           --disable-builtin-libvpx
-
-sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
-sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-
-%make_build
-
-%install
-%make_install
-
-find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
+NOCONFIGURE=1 ./autogen.sh
+export http_proxy=http://127.0.0.1:9/
+export https_proxy=http://127.0.0.1:9/
+export no_proxy=localhost,127.0.0.1,0.0.0.0
+export LANG=C
+export SOURCE_DATE_EPOCH=1547489839
+%configure --disable-static --prefix=%_prefix --sysconfdir=%{_sysconfdir}
+make %{?jobs:-j%jobs}
 
 %check
-%__make check
+export LANG=C
+export http_proxy=http://127.0.0.1:9/
+export https_proxy=http://127.0.0.1:9/
+export no_proxy=localhost,127.0.0.1,0.0.0.0
+make VERBOSE=1 V=1 %{?_smp_mflags} check
 
-%ldconfig_scriptlets
+%install
+export SOURCE_DATE_EPOCH=1547489839
+rm -rf %{buildroot}
+mkdir -p %{buildroot}/usr/share/package-licenses/gstreamer-vaapi
+cp COPYING.LIB %{buildroot}/usr/share/package-licenses/gstreamer-vaapi/COPYING.LIB
+%make_install
 
 %files
-%doc AUTHORS NEWS README
-%license COPYING.LIB
-%{_libdir}/gstreamer-1.0/*.so
-
-%files devel-docs
-%doc AUTHORS NEWS README
-%doc %{_datadir}/gtk-doc
-
+%defattr(-,root,root,-)
+/usr/lib/gstreamer-1.0/libgstvaapi.so
+/usr/share/package-licenses/gstreamer-vaapi/COPYING.LIB
