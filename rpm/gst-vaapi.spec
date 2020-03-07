@@ -2,10 +2,10 @@
 %define gstreamer    gstreamer
 
 Name     : %{gstreamer}%{majorminor}-vaapi
-Version  : 1.14.4
+Version  : 1.16.1
 Release  : 1
 URL      : https://cgit.freedesktop.org/gstreamer/gstreamer-vaapi
-Source0  : gstreamer1.0-vaapi-%{version}.tar.xz
+Source0  : %{name}-%{version}.tar.xz
 Summary  : No detailed summary available
 Group    : Development/Tools
 License  : LGPL-2.1
@@ -35,7 +35,7 @@ gstreamer-vaapi helper libraries and plugin elements are available
 under the terms of the GNU Lesser General Public License v2.1+
 
 %prep
-%setup -q -n gstreamer1.0-vaapi-%{version}/gstreamer-vaapi
+%setup -q -n %{name}-%{version}/gstreamer-vaapi
 
 %build
 NOCONFIGURE=1 ./autogen.sh
@@ -44,7 +44,9 @@ export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
 export SOURCE_DATE_EPOCH=1547489839
-%configure --disable-static --prefix=%_prefix --sysconfdir=%{_sysconfdir}
+%configure --disable-static --prefix=%_prefix --sysconfdir=%{_sysconfdir} \
+	--enable-x11=no --enable-egl=no --enable-glx=no --with-gtk=no \
+	--enable-wayland=yes --enable-drm=yes
 make %{?jobs:-j%jobs}
 
 %check
