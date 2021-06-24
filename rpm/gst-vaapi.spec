@@ -65,5 +65,5 @@ cp COPYING.LIB %{buildroot}/usr/share/package-licenses/gstreamer-vaapi/COPYING.L
 
 %files
 %defattr(-,root,root,-)
-/usr/lib/gstreamer-1.0/libgstvaapi.so
-/usr/share/package-licenses/gstreamer-vaapi/COPYING.LIB
+%{_libdir}/gstreamer-1.0/libgstvaapi.so
+%{_datadir}/package-licenses/gstreamer-vaapi/COPYING.LIB
