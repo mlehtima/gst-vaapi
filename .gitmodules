@@ -1,3 +1,3 @@
-[submodule "gstreamer-vaapi"]
-	path = gstreamer-vaapi
-	url = https://github.com/GStreamer/gstreamer-vaapi
+[submodule "gstreamer"]
+	path = gstreamer
+	url = https://github.com/sailfishos-mirror/gstreamer.git
